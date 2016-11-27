@@ -1,0 +1,28 @@
+{
+  "name": "autorouter",
+  "version": "0.0.1",
+  "description": "Auto routing your Express apps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Krisztian Sandor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christiansandor/autorouter.git"
+  },
+  "keywords": [
+    "auto",
+    "router",
+    "autorouter",
+    "express"
+  ],
+  "bugs": {
+    "url": "https://github.com/christiansandor/autorouter/issues"
+  },
+  "homepage": "https://github.com/christiansandor/autorouter#readme",
+  "devDependencies": {
+    "babel-preset-es2015": "^6.18.0"
+  }
+}
