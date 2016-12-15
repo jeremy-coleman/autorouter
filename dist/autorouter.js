@@ -40,10 +40,10 @@ var AutoRouter = function () {
             var files = fs.readdirSync(path.join(process.cwd(), base));
             files.map(function (fn) {
                 var file = getName(fn);
-                if (!file[2]) return _this.route(path.join(base, file[1]), path.join(entry, file[1]));
+                if (!file[2]) return _this.route(path.join(base, file[1]), entry + "/" + file[1]);
 
                 var name = file[1] === "index" ? "" : file[1];
-                var newEntry = path.join(entry, name);
+                var newEntry = entry + "/" + name;
                 var router = require(path.join(process.cwd(), base, name));
 
                 if (_this.map[newEntry]) {
@@ -53,7 +53,7 @@ var AutoRouter = function () {
                 }
 
                 _this.map[newEntry] = router;
-                _this.router.use(path.join(entry, name), router);
+                _this.router.use(newEntry, router);
             });
         }
     }]);
@@ -61,8 +61,8 @@ var AutoRouter = function () {
     return AutoRouter;
 }();
 
-module.exports = function () {
-    return new AutoRouter();
+module.exports = function (options) {
+    return new AutoRouter(options);
 };
 
 //# sourceMappingURL=autorouter.js.map

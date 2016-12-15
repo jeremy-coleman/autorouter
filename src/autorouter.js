@@ -26,10 +26,10 @@ class AutoRouter {
         const files = fs.readdirSync(path.join(process.cwd(), base));
         files.map((fn) => {
             const file = getName(fn);
-            if (!file[2]) return this.route(path.join(base, file[1]), path.join(entry, file[1]));
+            if (!file[2]) return this.route(path.join(base, file[1]), entry + "/" + file[1]);
 
             const name = file[1] === "index" ? "" : file[1];
-            const newEntry = path.join(entry, name);
+            const newEntry = entry + "/" + name;
             const router = require(path.join(process.cwd(), base, name));
 
             if (this.map[newEntry]) {
@@ -40,9 +40,9 @@ class AutoRouter {
             }
 
             this.map[newEntry] = router;
-            this.router.use(path.join(entry, name), router);
+            this.router.use(newEntry, router);
         });
     }
 }
 
-module.exports = () => new AutoRouter();
+module.exports = (options) => new AutoRouter(options);
