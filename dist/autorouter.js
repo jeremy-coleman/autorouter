@@ -1,68 +1,65 @@
 "use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var path = require("path");
-var express = require("express");
-
-var getName = function getName(fn) {
-    return fn.match(/^(.+?)(\.(js|ts)|)$/);
-};
-
-var AutoRouter = function () {
+var express_1 = require("express");
+var AutoRouter = (function () {
     function AutoRouter(options) {
-        _classCallCheck(this, AutoRouter);
-
-        this.map = {};
-        this.base = "routes";
-        this.entry = "/";
+        this.base = 'routes';
         this.force = false;
-
-        this.router = express.Router();
-
         if (options) {
-            if (options.base) this.base = options.base;
-            if (options.entry) this.entry = options.entry;
-            if (options.force) this.force = true;
+            if (options.base)
+                this.base = options.base;
+            if (options.force)
+                this.force = options.force;
         }
-
-        this.route(this.base, this.entry);
+        if (this.base[0] !== path.sep)
+            this.base = path.join(process.cwd(), this.base);
     }
-
-    _createClass(AutoRouter, [{
-        key: "route",
-        value: function route(base, entry) {
-            var _this = this;
-
-            var files = fs.readdirSync(path.join(process.cwd(), base));
-            files.map(function (fn) {
-                var file = getName(fn);
-                if (!file[2]) return _this.route(path.join(base, file[1]), entry + "/" + file[1]);
-
-                var name = file[1] === "index" ? "" : file[1];
-                var newEntry = entry + "/" + name;
-                var router = require(path.join(process.cwd(), base, name));
-
-                if (_this.map[newEntry]) {
-                    var message = "Entry " + newEntry + " is added more than one time.";
-
-                    if (_this.force) console.warn(message);else throw new Error(message);
-                }
-
-                _this.map[newEntry] = router;
-                _this.router.use(newEntry, router);
-            });
+    AutoRouter.getName = function (filename) {
+        var _a = filename.match(/^(.+?)(\.(js|ts)|)$/), fn = _a[0], filebase = _a[1], extension = _a[2];
+        return { filebase: filebase, extension: extension };
+    };
+    AutoRouter.getFiles = function (dir) {
+        return fs.readdirSync(dir);
+    };
+    AutoRouter.prototype.getRoutingFilesRecursively = function (dir, entry, map) {
+        var _this = this;
+        if (map === void 0) { map = {}; }
+        var handleFile = function (filename) {
+            var _a = AutoRouter.getName(filename), filebase = _a.filebase, extension = _a.extension;
+            var file = path.join(dir, filename);
+            var endpoint = entry + (filebase === 'index' ? '' : filebase);
+            if (endpoint[endpoint.length - 1] === '/')
+                endpoint = endpoint.slice(0, -1);
+            if (!extension) {
+                _this.getRoutingFilesRecursively(file, endpoint + '/', map);
+                return;
+            }
+            if (map[endpoint]) {
+                var message = "Route " + endpoint + " already exists in route map";
+                if (!_this.force)
+                    throw new Error(message);
+                console.warn(message);
+            }
+            map[endpoint] = file;
+        };
+        AutoRouter.getFiles(dir).map(handleFile);
+        return map;
+    };
+    AutoRouter.prototype.getRouter = function () {
+        var router = express_1.Router();
+        var map = this.getRoutingFilesRecursively(this.base, '/');
+        var keys = Object.keys(map);
+        var i = keys.length;
+        while (i--) {
+            var endpoint = keys[i];
+            var subRouter = require(map[endpoint]);
+            router.use(endpoint, subRouter);
         }
-    }]);
-
+        return router;
+    };
     return AutoRouter;
-}();
-
-module.exports = function (options) {
-    return new AutoRouter(options);
-};
-
+}());
+exports.AutoRouter = AutoRouter;
 //# sourceMappingURL=autorouter.js.map

@@ -92,3 +92,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 .idea/
+
+dist/autorouter.js
+dist/autorouter.js.map
+dist/autorouter.spec.js
+dist/autorouter.spec.js.map
+
+yarn.lock
