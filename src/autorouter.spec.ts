@@ -40,6 +40,13 @@ describe('AutoRouter', () => {
         expect(errorFunction).to.throw(Error, /Route \/a already exists in route map/);
     });
 
+    it('Should not throw an error on adding "a" twice when forced', () => {
+        const autorouter = new AutoRouter({force: true});
+        const errorFunction = autorouter.getRoutingFilesRecursively.bind(autorouter, 'routes', '/');
+
+        expect(errorFunction).not.to.throw(Error, /Route \/a already exists in route map/);
+    });
+
     it('Should create a map of flat files', () => {
         const _getFiles = AutoRouter.getFiles;
         AutoRouter.getFiles = function () {
@@ -80,6 +87,34 @@ describe('AutoRouter', () => {
         const router = autorouter.getRouter();
 
         expect(router).to.have.property('stack').which.have.lengthOf(2);
+
+        AutoRouter.getFiles = _getFiles;
+    });
+
+    it('Should handle different base', () => {
+        const _getFiles = AutoRouter.getFiles;
+        AutoRouter.getFiles = function () {
+            return ['index.js'];
+        };
+
+        const autorouter = new AutoRouter({base: path.join('router', 'a')});
+        const map = autorouter.getRoutingFilesRecursively('routes', '/');
+
+        expect(map).to.have.property('/a', path.join('routes', 'a', 'index.js'));
+
+        AutoRouter.getFiles = _getFiles;
+    });
+
+    it('Should handle absolute base', () => {
+        const _getFiles = AutoRouter.getFiles;
+        AutoRouter.getFiles = function () {
+            return ['index.js'];
+        };
+
+        const autorouter = new AutoRouter({base: path.join(process.cwd(), 'router', 'a')});
+        const map = autorouter.getRoutingFilesRecursively('routes', '/');
+
+        expect(map).to.have.property('/a', 'routes/a/index.js');
 
         AutoRouter.getFiles = _getFiles;
     });
