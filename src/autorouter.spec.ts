@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from "path";
 
+import {spy} from 'sinon';
 import {expect} from 'chai';
 import {AutoRouter} from './autorouter';
 
@@ -15,14 +16,6 @@ describe('AutoRouter', () => {
         } catch (err) {
             console.log('Files or folders already exist');
         }
-    });
-
-    after(() => {
-        fs.unlinkSync('routes/a.js');
-        fs.unlinkSync('routes/b.js');
-        fs.unlinkSync('routes/a/index.js');
-        fs.rmdirSync('routes/a');
-        fs.rmdirSync('routes');
     });
 
     it('Should get the correct files', () => {
@@ -41,10 +34,17 @@ describe('AutoRouter', () => {
     });
 
     it('Should not throw an error on adding "a" twice when forced', () => {
+        const warnSpy = spy();
+        const _warn = console.warn;
+        console.warn = warnSpy;
+
         const autorouter = new AutoRouter({force: true});
         const errorFunction = autorouter.getRoutingFilesRecursively.bind(autorouter, 'routes', '/');
 
-        expect(errorFunction).not.to.throw(Error, /Route \/a already exists in route map/);
+        expect(errorFunction).not.to.throw(Error);
+        expect(warnSpy.called).to.be.true;
+
+        console.warn = _warn;
     });
 
     it('Should create a map of flat files', () => {
@@ -54,10 +54,10 @@ describe('AutoRouter', () => {
         };
 
         const autorouter = new AutoRouter({});
-        const map = autorouter.getRoutingFilesRecursively('routes', '/');
+        const map = autorouter.getRoutingFilesRecursively(autorouter.base, '/');
 
-        expect(map).to.have.property('/a', 'routes/a.js');
-        expect(map).to.have.property('/b', 'routes/b.js');
+        expect(map).to.have.property('/a', path.join(autorouter.base, 'a.js'));
+        expect(map).to.have.property('/b', path.join(autorouter.base, 'b.js'));
 
         AutoRouter.getFiles = _getFiles;
     });
@@ -65,14 +65,14 @@ describe('AutoRouter', () => {
     it('Should create a map of mixed files', () => {
         const _getFiles = AutoRouter.getFiles;
         AutoRouter.getFiles = function (dir) {
-            return dir === 'routes' ? ['a', 'b.js'] : ['index.js'];
+            return dir === path.join(process.cwd(), 'routes') ? ['a', 'b.js'] : ['index.js'];
         };
 
         const autorouter = new AutoRouter({});
-        const map = autorouter.getRoutingFilesRecursively('routes', '/');
+        const map = autorouter.getRoutingFilesRecursively(autorouter.base, '/');
 
-        expect(map).to.have.property('/a', 'routes/a/index.js');
-        expect(map).to.have.property('/b', 'routes/b.js');
+        expect(map).to.have.property('/a', path.join(autorouter.base, 'a', 'index.js'));
+        expect(map).to.have.property('/b', path.join(autorouter.base, 'b.js'));
 
         AutoRouter.getFiles = _getFiles;
     });
@@ -92,30 +92,24 @@ describe('AutoRouter', () => {
     });
 
     it('Should handle different base', () => {
-        const _getFiles = AutoRouter.getFiles;
-        AutoRouter.getFiles = function () {
-            return ['index.js'];
-        };
+        const autorouter = new AutoRouter({base: path.join('routes', 'a')});
+        const map = autorouter.getRoutingFilesRecursively(autorouter.base, '/');
 
-        const autorouter = new AutoRouter({base: path.join('router', 'a')});
-        const map = autorouter.getRoutingFilesRecursively('routes', '/');
-
-        expect(map).to.have.property('/a', path.join('routes', 'a', 'index.js'));
-
-        AutoRouter.getFiles = _getFiles;
+        expect(map).to.have.property('/', path.join(autorouter.base, 'index.js'));
     });
 
     it('Should handle absolute base', () => {
-        const _getFiles = AutoRouter.getFiles;
-        AutoRouter.getFiles = function () {
-            return ['index.js'];
-        };
+        const autorouter = new AutoRouter({base: path.join(process.cwd(), 'routes', 'a')});
+        const map = autorouter.getRoutingFilesRecursively(autorouter.base, '/');
 
-        const autorouter = new AutoRouter({base: path.join(process.cwd(), 'router', 'a')});
-        const map = autorouter.getRoutingFilesRecursively('routes', '/');
+        expect(map).to.have.property('/', path.join(autorouter.base, 'index.js'));
+    });
 
-        expect(map).to.have.property('/a', 'routes/a/index.js');
-
-        AutoRouter.getFiles = _getFiles;
+    after(() => {
+        // fs.unlinkSync('routes/a.js');
+        // fs.unlinkSync('routes/b.js');
+        // fs.unlinkSync('routes/a/index.js');
+        // fs.rmdirSync('routes/a');
+        // fs.rmdirSync('routes');
     });
 });

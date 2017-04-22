@@ -44,7 +44,7 @@ export class AutoRouter implements AutoRouterOptions {
             const file = path.join(dir, filename);
 
             let endpoint = entry + (filebase === 'index' ? '' : filebase);
-            if (endpoint[endpoint.length - 1] === '/') endpoint = endpoint.slice(0, -1);
+            if (endpoint.length !== 1 && endpoint[endpoint.length - 1] === '/') endpoint = endpoint.slice(0, -1);
 
             if (!extension) {
                 this.getRoutingFilesRecursively(file, endpoint + '/', map);
