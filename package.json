@@ -1,13 +1,13 @@
 {
   "name": "autorouter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Auto routing your Express apps",
   "main": "dist/autorouter.min.js",
   "author": "Krisztian Sandor",
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/gulp default",
-    "test": "./node_modules/.bin/gulp tests"
+    "test": "./node_modules/.bin/tsc -p tsconfig.json; node ./node_modules/istanbul/lib/cli.js cover -x '**/*.spec.js' ./node_modules/mocha/bin/_mocha -- -R spec './dist/autorouter.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -29,10 +29,12 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.13",
     "chai": "^3.5.0",
+    "coveralls": "^2.13.0",
     "gulp": "^3.9.1",
     "gulp-rename": "^1.2.2",
     "gulp-typescript": "^3.1.6",
     "gulp-uglify": "^2.1.2",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "typescript": "^2.2.2"
   },
