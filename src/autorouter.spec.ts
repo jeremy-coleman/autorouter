@@ -6,7 +6,7 @@ import {expect} from 'chai';
 import {AutoRouter} from './autorouter';
 
 describe('AutoRouter', () => {
-    before(() => {
+    beforeEach(() => {
         try {
             fs.mkdirSync('routes');
             fs.mkdirSync('routes/a');
@@ -105,11 +105,11 @@ describe('AutoRouter', () => {
         expect(map).to.have.property('/', path.join(autorouter.base, 'index.js'));
     });
 
-    after(() => {
-        // fs.unlinkSync('routes/a.js');
-        // fs.unlinkSync('routes/b.js');
-        // fs.unlinkSync('routes/a/index.js');
-        // fs.rmdirSync('routes/a');
-        // fs.rmdirSync('routes');
+    afterEach(() => {
+        fs.unlinkSync('routes/a.js');
+        fs.unlinkSync('routes/b.js');
+        fs.unlinkSync('routes/a/index.js');
+        fs.rmdirSync('routes/a');
+        fs.rmdirSync('routes');
     });
 });
