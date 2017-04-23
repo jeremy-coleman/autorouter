@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/christiansandor/autorouter.svg?branch=master)](https://travis-ci.org/christiansandor/autorouter)
+[![Coverage Status](https://coveralls.io/repos/github/christiansandor/autorouter/badge.svg?branch=master)](https://coveralls.io/github/christiansandor/autorouter?branch=master)
+[![NSP Status](https://nodesecurity.io/orgs/sandor-krisztian/projects/b42b5d0a-51e9-4b64-bbfb-027592956e63/badge)](https://nodesecurity.io/orgs/sandor-krisztian/projects/b42b5d0a-51e9-4b64-bbfb-027592956e63)
+
 # AutoRouter
 
 AutoRouter creates an Express Router out of sub-routers in a folder
