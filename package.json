@@ -1,8 +1,8 @@
 {
   "name": "autorouter",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Auto routing your Express apps",
-  "main": "dist/autorouter.min.js",
+  "main": "index.js",
   "author": "Krisztian Sandor",
   "license": "MIT",
   "scripts": {
