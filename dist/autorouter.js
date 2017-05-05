@@ -62,4 +62,3 @@ var AutoRouter = (function () {
     return AutoRouter;
 }());
 exports.AutoRouter = AutoRouter;
-//# sourceMappingURL=autorouter.js.map
