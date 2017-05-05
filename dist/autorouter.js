@@ -30,7 +30,7 @@ var AutoRouter = (function () {
             var _a = AutoRouter.getName(filename), filebase = _a.filebase, extension = _a.extension;
             var file = path.join(dir, filename);
             var endpoint = entry + (filebase === 'index' ? '' : filebase);
-            if (endpoint[endpoint.length - 1] === '/')
+            if (endpoint.length !== 1 && endpoint[endpoint.length - 1] === '/')
                 endpoint = endpoint.slice(0, -1);
             if (!extension) {
                 _this.getRoutingFilesRecursively(file, endpoint + '/', map);

@@ -7,7 +7,6 @@
     "outDir": "./dist"
   },
   "files": [
-    "src/autorouter.ts",
-    "src/autorouter.spec.ts"
+    "src/autorouter.ts"
   ]
 }
